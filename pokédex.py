@@ -7,6 +7,7 @@ import pickle
 window = tk.Tk()
 window.title("Pokédex")
 window.geometry("1024x768")
+window.iconbitmap('/Users/Python/image/PokéBall.png')
 
 
 #CRÉATION DES FONCTIONS 
@@ -17,7 +18,16 @@ def ajoute_list():
     name_pokemon = name_text.get()
     pokedex[name_pokemon] = type_pokemon, life_pokemon
     liste_pokemon.insert(tk.END, name_pokemon)
+    type_text.delete(0, tk.END)
+    life_text.delete(0, tk.END)
+    name_text.delete(0, tk.END)
     messagebox.showinfo("Sauvegarde", "Pokémon sauvegardé !")
+    with open('/Users/Python/projetPython/pokemon_file.pkl', 'wb') as f:  # open a text file
+        pickle.dump(pokedex, f) # serialize the list
+        f.close()
+
+    with open('/Users/Python/projetPython/pokemon_file.pkl', 'rb') as f:
+        pokedex_loaded = pickle.load(f) # deserialize using load()
 
 def afficher_entree():
     index = liste_pokemon.curselection()
@@ -26,7 +36,6 @@ def afficher_entree():
         test = liste_pokemon.get(index)
         entree = pokedex.get(test, "")
         messagebox.showinfo("Info", f"Élément : {entree[0]}\n Type : {entree[1]}")
-
 
 # DONNÉES UTILISATEUR 
 liste_pokemon = tk.Listbox(window)
@@ -53,6 +62,7 @@ life_text.pack()
 bouton_envoi = tk.Button(window, text ="Envoyer",command=ajoute_list)
 bouton_envoi.pack()
 pokedex = {}
+
 
 
 # FIN DU PROGRAMME
