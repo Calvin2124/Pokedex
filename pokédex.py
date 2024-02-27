@@ -1,12 +1,51 @@
 import tkinter as tk
 from tkinter import messagebox
 import pickle
+from tkinter import PhotoImage
+from PIL import Image, ImageTk
 
 # PARAMETRE DE LA PAGE
 window = tk.Tk()
 window.title("Pokédex")
-window.geometry("1024x768")
-window.iconbitmap('/Users/Python/image/PokéBall.png')
+window.geometry("1024x695")
+# Chemin de l'image PNG
+image_path = "/Users/Python/image/PokéBall.png"
+# Charger l'image
+icon_image = tk.PhotoImage(file=image_path)
+# Définir l'icône de la fenêtre
+window.iconphoto(True, icon_image)
+
+# Chargement de l'image au format
+image_life = "/Users/Python/image/regeneration50x50-effet-minecraft.png"
+life_img = tk.PhotoImage(file=image_life)
+image_pokemon = "/Users/Python/image/International1_Pokémon_logo.png"
+pokemon_img = tk.PhotoImage(file=image_pokemon)
+image_type = "/Users/Python/image/pokemon-symbol-png-tra.png"
+type_img = tk.PhotoImage(file=image_type)
+
+#FONCTION GIF
+class AnimatedGIF(tk.Label):
+    def __init__(self, master, path):
+        self.master = master
+        self.index = 0
+        self.gif = Image.open(path)
+        self.frames = []
+        try:
+            while True:
+                self.frames.append(self.gif.copy())
+                self.gif.seek(len(self.frames))
+        except EOFError:
+            pass
+        self.delay = self.gif.info['duration']
+        self.image = ImageTk.PhotoImage(self.frames[0])
+        super().__init__(master, image=self.image)
+
+    def update_image(self):
+        self.index += 1
+        if self.index == len(self.frames):
+            self.index = 0
+        self.image.paste(self.frames[self.index])
+        self.after(self.delay, self.update_image)
 
 # FONCTION POUR CHARGER LES DONNÉES
 def charger_donnees():
@@ -46,33 +85,71 @@ def supprimer_pokemon():
         liste_pokemon.delete(index)
         sauvegarder_donnees()
 
-# CRÉATION DES WIDGETS
-liste_pokemon = tk.Listbox(window)
-liste_pokemon.pack()
-# BOUTON POUR AVOIR LES INFORMATIONS SUR LE POKEMON
-button_info = tk.Button(window, text="Plus d'information", command=afficher_entree)
-button_info.pack()
-# BOUTON POUR SUPPRIMER UN POKÉMON
-bouton_supprimer = tk.Button(window, text="Supprimer Pokémon", command=supprimer_pokemon)
-bouton_supprimer.pack()
+frame = tk.Frame(window, padx=5, pady=5)
+frame.pack(fill="both", expand=True)
 
-label1 = tk.Label(window, text="Nom de votre Pokémon :")
+# Première ligne avec 3 éléments centrés
+div1 = tk.Frame(frame, bg="#5490d5", pady=32)
+div1.grid(row=0, column=0, sticky="nsew")
+
+div2 = tk.Frame(frame, bg="#5490d5", pady=32)
+div2.grid(row=0, column=1, sticky="nsew")
+
+div3 = tk.Frame(frame, bg="#5490d5", pady=32)
+div3.grid(row=0, column=2, sticky="nsew")
+
+#REMPLIR LES ELEMENTS 
+label_pokemon = tk.Label(div1, image=pokemon_img, bg="#5490d5")
+label_pokemon.pack()
+label1 = tk.Label(div1, text="Nom de votre Pokémon :", bg="#5490d5", fg="black", pady=10, font=("Helvetica", 19))
 label1.pack()
-name_text = tk.Entry(window)
-name_text.pack()
+name_text = tk.Entry(div1, bg="#5490d5", border=0, fg="#000")
+name_text.pack() 
 
-label2 = tk.Label(window, text="Type de votre Pokémon :")
+label_type = tk.Label(div2, image=type_img, bg="#5490d5")
+label_type.pack()
+label2 = tk.Label(div2, text="Type de votre Pokémon :", bg="#5490d5", fg="black", pady=10, font=("Helvetica", 19))
 label2.pack()
-type_text = tk.Entry(window)
+type_text = tk.Entry(div2, bg="#5490d5", border=0, fg="#000")
 type_text.pack()
 
-label3 = tk.Label(window, text="Vie de votre Pokémon :")
+label_life = tk.Label(div3, image=life_img, bg="#5490d5")
+label_life.pack()
+label3 = tk.Label(div3, text="Vie de votre Pokémon :", bg="#5490d5", fg="black", pady=10, font=("Helvetica", 19))
 label3.pack()
-life_text = tk.Entry(window)
+life_text = tk.Entry(div3, bg="#5490d5", border=0, fg="#000")
 life_text.pack()
 
-bouton_envoi = tk.Button(window, text="Envoyer", command=lambda: ajoute_list())
-bouton_envoi.pack()
+# Deuxième ligne avec un élément qui prend toute la longueur et centré
+div4 = tk.Frame(frame)
+div4.grid(row=1, column=0, columnspan=3, sticky="nsew")
+
+# Charger et afficher le GIF animé
+gif_label = AnimatedGIF(div4, "/Users/Python/image/tumblr_mb7ajc09St1rfjowdo1_500.gif")
+gif_label.grid(row=0, column=0)
+# gif_label.configure(bg="#316ef3")
+# Mettre à jour l'affichage du GIF animé
+gif_label.update_image()
+
+# LISTBOX
+liste_pokemon = tk.Listbox(div4, bg="#316ef3")
+liste_pokemon.grid(row=0, column=1, sticky="nsew")
+
+container_btn = tk.Frame(div4, pady=150, padx=70)
+container_btn.grid(row=0, column=2, sticky="nsew")
+
+
+# BOUTON POUR AVOIR LES INFORMATIONS SUR LE POKEMON
+button_info = tk.Button(container_btn, text="Plus d'information", pady=15, padx= 15, command=afficher_entree)
+button_info.grid(row=0, column=1, sticky="nsew")
+# BOUTON POUR SUPPRIMER UN POKÉMON
+bouton_supprimer = tk.Button(container_btn, text="Supprimer Pokémon", pady=15, padx= 15, command=supprimer_pokemon)
+bouton_supprimer.grid(row=1, column=1, sticky="nsew", pady=30)
+# BOUTON D'ENVOI
+bouton_envoi = tk.Button(container_btn, text="Envoyer", pady=15, padx= 15, command=lambda: ajoute_list())
+bouton_envoi.grid(row=3, column=1, sticky="nsew")
+
+
 
 # FONCTION POUR AJOUTER UN POKÉMON À LA LISTE
 def ajoute_list():
@@ -90,6 +167,12 @@ def ajoute_list():
 # CHARGEMENT INITIAL DES DONNÉES
 for pokemon in pokedex:
     liste_pokemon.insert(tk.END, pokemon)
+
+    # Configurer le redimensionnement des cellules de la grille pour qu'elles s'ajustent lors du redimensionnement de la fenêtre
+for i in range(3):
+    frame.grid_columnconfigure(i, weight=1)
+
+frame.grid_rowconfigure(1, weight=1)
 
 # FIN DU PROGRAMME
 window.mainloop()
